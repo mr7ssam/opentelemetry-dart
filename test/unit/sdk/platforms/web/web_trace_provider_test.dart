@@ -12,7 +12,7 @@ import '../../../mocks.dart';
 
 void main() {
   test('getTracer stores tracers by name', () {
-    final provider = WebTracerProvider();
+    final provider = TracerProvider();
     final fooTracer = provider.getTracer('foo');
     final barTracer = provider.getTracer('bar');
     final fooWithVersionTracer = provider.getTracer('foo', version: '1.0');
@@ -32,7 +32,7 @@ void main() {
     final mockProcessor1 = MockSpanProcessor();
     final mockProcessor2 = MockSpanProcessor();
     final provider =
-        WebTracerProvider(processors: [mockProcessor1, mockProcessor2]);
+        TracerProvider(processors: [mockProcessor1, mockProcessor2]);
 
     expect(provider.spanProcessors, [mockProcessor1, mockProcessor2]);
   });
@@ -40,8 +40,7 @@ void main() {
   test('browserTracerProvider force flushes all processors', () {
     final mockProcessor1 = MockSpanProcessor();
     final mockProcessor2 = MockSpanProcessor();
-    WebTracerProvider(processors: [mockProcessor1, mockProcessor2])
-        .forceFlush();
+    TracerProvider(processors: [mockProcessor1, mockProcessor2]).forceFlush();
 
     verify(mockProcessor1.forceFlush()).called(1);
     verify(mockProcessor2.forceFlush()).called(1);
@@ -50,7 +49,7 @@ void main() {
   test('browserTracerProvider shuts down all processors', () {
     final mockProcessor1 = MockSpanProcessor();
     final mockProcessor2 = MockSpanProcessor();
-    WebTracerProvider(processors: [mockProcessor1, mockProcessor2]).shutdown();
+    TracerProvider(processors: [mockProcessor1, mockProcessor2]).shutdown();
 
     verify(mockProcessor1.shutdown()).called(1);
     verify(mockProcessor2.shutdown()).called(1);
@@ -58,11 +57,11 @@ void main() {
 
   test('browserTracerProvider creates a tracer which can create valid spans',
       () async {
-    final span = WebTracerProvider(processors: [MockSpanProcessor()])
+    final span = TracerProvider(processors: [MockSpanProcessor()])
         .getTracer('testTracer')
         .startSpan('testSpan', context: Context.root)
-          ..end();
+      ..end();
 
-    expect(span.startTime, lessThanOrEqualTo(span.endTime));
+    expect(span.startTime, lessThanOrEqualTo(span.endTime!));
   });
 }

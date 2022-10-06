@@ -6,7 +6,7 @@ import '../../../api.dart' as api;
 import '../../../sdk.dart' as sdk;
 
 /// A registry for creating named [api.Tracer]s.
-class TracerProviderBase implements api.TracerProvider {
+class TracerProvider implements api.TracerProvider {
   final Map<String, api.Tracer> _tracers = {};
   final List<api.SpanProcessor> _processors;
   final sdk.Resource _resource;
@@ -14,12 +14,12 @@ class TracerProviderBase implements api.TracerProvider {
   final api.IdGenerator _idGenerator;
   final sdk.SpanLimits _spanLimits;
 
-  TracerProviderBase(
-      {List<api.SpanProcessor> processors,
-      sdk.Resource resource,
-      sdk.Sampler sampler,
-      api.IdGenerator idGenerator,
-      sdk.SpanLimits spanLimits})
+  TracerProvider(
+      {List<api.SpanProcessor>? processors,
+      sdk.Resource? resource,
+      sdk.Sampler? sampler,
+      api.IdGenerator? idGenerator,
+      sdk.SpanLimits? spanLimits})
       : _processors = processors ?? [], // Default to a no-op TracerProvider.
         _resource = resource ?? sdk.Resource([]),
         _sampler = sampler ?? sdk.ParentBasedSampler(sdk.AlwaysOnSampler()),
@@ -29,7 +29,7 @@ class TracerProviderBase implements api.TracerProvider {
   List<api.SpanProcessor> get spanProcessors => _processors;
 
   @override
-  api.Tracer getTracer(String name, {String version = ''}) {
+  api.Tracer getTracer(String name, {String? version = ''}) {
     final key = '$name@$version';
     return _tracers.putIfAbsent(
         key,

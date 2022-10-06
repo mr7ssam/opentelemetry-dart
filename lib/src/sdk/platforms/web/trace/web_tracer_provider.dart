@@ -7,7 +7,7 @@ import '../../../trace/tracer.dart';
 
 /// A [api.TracerProvider] which implements features specific to `dart:html`.
 ///
-/// Use of [WebTracerProvider] with this provider results in a [api.Tracer]
+/// Use of [TracerProvider] with this provider results in a [api.Tracer]
 /// which uses the `window.performance` API for high-precision timestamps
 /// on the [api.Span]s it creates.
 ///
@@ -15,7 +15,7 @@ import '../../../trace/tracer.dart';
 /// suspended for sleep.
 /// See https://github.com/open-telemetry/opentelemetry-js/issues/852
 /// for more information.
-class WebTracerProvider extends sdk.TracerProviderBase {
+class TracerProvider extends sdk.TracerProvider {
   final Map<String, api.Tracer> _tracers = {};
   final List<api.SpanProcessor> _processors;
   final sdk.Resource _resource;
@@ -24,13 +24,13 @@ class WebTracerProvider extends sdk.TracerProviderBase {
   final api.IdGenerator _idGenerator;
   final sdk.SpanLimits _spanLimits;
 
-  WebTracerProvider(
-      {List<api.SpanProcessor> processors,
-      sdk.Resource resource,
-      sdk.Sampler sampler,
-      sdk.TimeProvider timeProvider,
-      api.IdGenerator idGenerator,
-      sdk.SpanLimits spanLimits})
+  TracerProvider(
+      {List<api.SpanProcessor>? processors,
+      sdk.Resource? resource,
+      sdk.Sampler? sampler,
+      sdk.TimeProvider? timeProvider,
+      api.IdGenerator? idGenerator,
+      sdk.SpanLimits? spanLimits})
       :
         // Default to a no-op TracerProvider.
         _processors = processors ?? [],
@@ -47,7 +47,7 @@ class WebTracerProvider extends sdk.TracerProviderBase {
             spanLimits: spanLimits);
 
   @override
-  api.Tracer getTracer(String name, {String version = ''}) {
+  api.Tracer getTracer(String name, {String? version = ''}) {
     return _tracers.putIfAbsent(
         '$name@$version',
         () => Tracer(_processors, _resource, _sampler, _timeProvider,

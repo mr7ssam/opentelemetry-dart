@@ -16,11 +16,11 @@ void main() {
             api.TraceFlags.none, sdk.TraceState.empty()),
         api.SpanId([4, 5, 6]),
         [],
-        WebTimeProvider(),
+        TimeProvider(),
         sdk.Resource([]),
         sdk.InstrumentationLibrary('library_name', 'library_version'))
       ..end();
 
-    expect(span.startTime, lessThanOrEqualTo(span.endTime));
+    expect(span.startTime, lessThanOrEqualTo(span.endTime!));
   });
 }

@@ -19,7 +19,7 @@ import 'package:test/test.dart';
 import '../../mocks.dart';
 
 void main() {
-  MockHTTPClient mockClient;
+  late MockHTTPClient mockClient;
   final uri =
       Uri.parse('https://h.wdesk.org/s/opentelemetry-collector/v1/traces');
 
@@ -88,7 +88,7 @@ void main() {
                       parentSpanId: [4, 5, 6],
                       name: 'foo',
                       startTimeUnixNano: span1.startTime,
-                      endTimeUnixNano: span1.endTime,
+                      endTimeUnixNano: span1.endTime!,
                       attributes: [
                         pb_common.KeyValue(
                             key: 'foo',
@@ -104,7 +104,7 @@ void main() {
                       parentSpanId: [4, 5, 6],
                       name: 'baz',
                       startTimeUnixNano: span2.startTime,
-                      endTimeUnixNano: span2.endTime,
+                      endTimeUnixNano: span2.endTime!,
                       attributes: [
                         pb_common.KeyValue(
                             key: 'bool',

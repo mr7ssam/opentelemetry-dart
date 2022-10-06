@@ -17,7 +17,7 @@ import '../../../../../sdk.dart' as sdk;
 /// Note that this time may be inaccurate if the executing system is suspended
 /// for sleep.  See https://github.com/open-telemetry/opentelemetry-js/issues/852
 /// for more information.
-class WebTimeProvider implements sdk.TimeProvider {
+class TimeProvider implements sdk.TimeProvider {
   static final Int64 _timeOrigin = _fromDouble(
       JsObject.fromBrowserObject(window)['performance']['timeOrigin'] ??
           // fallback for browsers that don't support timeOrigin, like Dartium

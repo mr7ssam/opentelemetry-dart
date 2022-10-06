@@ -1,8 +1,10 @@
+import 'package:logging/logging.dart';
 import 'package:opentelemetry/api.dart' as api;
+import 'package:opentelemetry/src/api/metrics/meter_key.dart';
 import 'package:opentelemetry/src/experimental_api.dart' as api;
 import 'package:opentelemetry/src/experimental_sdk.dart' as sdk;
-import 'package:logging/logging.dart';
-import 'package:opentelemetry/src/api/metrics/meter_key.dart';
+
+import 'meter.dart';
 
 const invalidMeterNameMessage = 'Invalid Meter Name';
 
@@ -11,7 +13,7 @@ class MeterProvider implements api.MeterProvider {
   final _logger = Logger('opentelemetry.sdk.metrics.meterprovider');
 
   @override
-  sdk.Meter get(String name,
+  sdk.Meter get(String? name,
       {String version = '',
       String schemaUrl = '',
       List<api.Attribute> attributes = const []}) {
@@ -19,11 +21,8 @@ class MeterProvider implements api.MeterProvider {
       name = '';
       _logger.warning(invalidMeterNameMessage, '', StackTrace.current);
     }
-    version ??= '';
-    schemaUrl ??= '';
-    attributes ??= const [];
     final key = MeterKey(name, version, schemaUrl, attributes);
 
-    return _meters.putIfAbsent(key, () => sdk.Meter());
+    return _meters.putIfAbsent(key, () => sdk.Meter()) as Meter;
   }
 }
