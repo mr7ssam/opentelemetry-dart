@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. Please see https://github.com/Workiva/opentelemetry-dart/blob/master/LICENSE for more information
 
 @TestOn('vm')
+import 'package:http/http.dart';
 import 'package:mockito/mockito.dart';
 import 'package:opentelemetry/api.dart' as api;
 import 'package:opentelemetry/sdk.dart' as sdk;
@@ -154,6 +155,12 @@ void main() {
       ..export([span]);
 
     verify(mockClient.close()).called(1);
+
+    when(mockClient.post(uri,
+            body: anything,
+            headers: {'Content-Type': 'application/x-protobuf'}))
+        .thenAnswer((realInvocation) async => Response('body', 200));
+
     verifyNever(mockClient.post(uri,
         body: anything, headers: {'Content-Type': 'application/x-protobuf'}));
   });

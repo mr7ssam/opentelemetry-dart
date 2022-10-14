@@ -143,8 +143,8 @@ class CollectorExporter implements api.SpanExporter {
         attributes: span.attributes.keys.map((key) => pb_common.KeyValue(
             key: key!,
             value: _attributeValueToProtobuf(span.attributes.get(key)))),
-        status: pb_trace.Status(
-            code: statusCode, message: span.status.description!),
+        status:
+            pb_trace.Status(code: statusCode, message: span.status.description),
         kind: spanKind,
         links: _spanLinksToProtobuf(span.links));
   }
