@@ -36,7 +36,7 @@ class CollectorExporter implements api.SpanExporter {
         resourceSpans: _spansToProtobuf(spans));
 
     client.post(uri,
-        body: body.writeToBuffer(),
+        body: body.writeToJsonMap(),
         headers: {'Content-Type': 'application/x-protobuf'});
   }
 
