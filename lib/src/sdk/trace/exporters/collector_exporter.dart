@@ -37,7 +37,7 @@ class CollectorExporter implements api.SpanExporter {
 
     client.post(uri,
         body: body.writeToJson(),
-        headers: {'Content-Type': 'application/json'});
+        headers: {'Content-Type': 'application/x-protobuf'});
   }
 
   /// Group and construct the protobuf equivalent of the given list of [api.Span]s.
