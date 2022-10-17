@@ -1,8 +1,8 @@
 // Copyright 2021-2022 Workiva.
 // Licensed under the Apache License, Version 2.0. Please see https://github.com/Workiva/opentelemetry-dart/blob/master/LICENSE for more information
 
+import 'package:dio/dio.dart';
 import 'package:fixnum/fixnum.dart';
-import 'package:http/http.dart' as http;
 
 import '../../../../api.dart' as api;
 import '../../../../sdk.dart' as sdk;
@@ -14,12 +14,13 @@ import '../../proto/opentelemetry/proto/resource/v1/resource.pb.dart'
 import '../../proto/opentelemetry/proto/trace/v1/trace.pb.dart' as pb_trace;
 
 class CollectorExporter implements api.SpanExporter {
-  Uri uri;
-  late http.Client client;
+  String uri;
+  late Dio client;
   var _isShutdown = false;
 
-  CollectorExporter(this.uri, {http.Client? httpClient}) {
-    client = httpClient ?? http.Client();
+  CollectorExporter(this.uri, {Dio? dio}) {
+    client = dio ?? Dio();
+    client.options.baseUrl = uri;
   }
 
   @override
@@ -35,9 +36,16 @@ class CollectorExporter implements api.SpanExporter {
     final body = pb_trace_service.ExportTraceServiceRequest(
         resourceSpans: _spansToProtobuf(spans));
 
-    client.post(uri,
-        body: body.writeToBuffer(),
-        headers: {'Content-Type': 'application/x-protobuf'});
+    client.post(
+      uri,
+      data: body.writeToBuffer(),
+      options: Options(
+        headers: {
+          'Content-Type': 'application/x-protobuf',
+          'Origin': 'https://mobile.supy.io',
+        },
+      ),
+    );
   }
 
   /// Group and construct the protobuf equivalent of the given list of [api.Span]s.

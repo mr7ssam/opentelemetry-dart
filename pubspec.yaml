@@ -6,8 +6,8 @@ environment:
   sdk: '>=2.12.0 <3.0.0'
 
 dependencies:
+  dio: ^4.0.6
   fixnum: ^1.0.1
-  http: ^0.13.5
   logging: ^1.1.0
   protobuf: ^2.1.0
   quiver: ^3.1.0
