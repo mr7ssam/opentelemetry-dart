@@ -6,13 +6,17 @@ import 'package:fixnum/fixnum.dart';
 
 import '../../../../api.dart' as api;
 import '../../../../sdk.dart' as sdk;
-import '../../proto/opentelemetry/proto/collector/trace/v1/trace_service.pb.dart'
-    as pb_trace_service;
 import '../../proto/opentelemetry/proto/common/v1/common.pb.dart' as pb_common;
 import '../../proto/opentelemetry/proto/resource/v1/resource.pb.dart'
     as pb_resource;
 import '../../proto/opentelemetry/proto/trace/v1/trace.pb.dart' as pb_trace;
 
+final _instrumentationLibrary = {
+  'name': 'opentelemetry-dart',
+  'version': '0.15.0'
+};
+
+//Todo we should move from protoBuf at all
 class CollectorExporter implements api.SpanExporter {
   String uri;
   late Dio client;
@@ -33,19 +37,104 @@ class CollectorExporter implements api.SpanExporter {
       return;
     }
 
-    final body = pb_trace_service.ExportTraceServiceRequest(
-        resourceSpans: _spansToProtobuf(spans));
+    final spansToProtobuf = _spansToProtobuf(spans);
 
+    final data = _resourceSpansToMap(spansToProtobuf);
     client.post(
       uri,
-      data: body.writeToBuffer(),
+      data: data,
       options: Options(
         headers: {
-          'Content-Type': 'application/x-protobuf',
+          'Content-Type': 'application/json',
           'Origin': 'https://mobile.supy.io',
         },
       ),
     );
+  }
+
+  Map<String, dynamic> _resourceSpansToMap(
+      Iterable<pb_trace.ResourceSpans> resourceSpans) {
+    final resourceSpans = [];
+    for (final resourceSpan in resourceSpans) {
+      resourceSpans.add(_resourceSpanToMap(resourceSpan));
+    }
+    return {'resourceSpans': resourceSpans};
+  }
+
+  Map<String, dynamic> _resourceSpanToMap(pb_trace.ResourceSpans resourceSpan) {
+    final map = <String, dynamic>{};
+    final instrumentationLibrarySpans = [];
+
+    final resourceAttributes =
+        _attributesToList(resourceSpan.resource.attributes);
+    final droppedAttributesCount = resourceSpan.resource.droppedAttributesCount;
+
+    for (final instrumentationLibrarySpan
+        in resourceSpan.instrumentationLibrarySpans) {
+      final spans = instrumentationLibrarySpan.spans;
+      instrumentationLibrarySpans.add(
+        {
+          'spans': _spansToList(spans),
+          'instrumentationLibrary': _instrumentationLibrary
+        },
+      );
+    }
+
+    map['resource'] = {
+      'attributes': resourceAttributes,
+      'droppedAttributesCount': droppedAttributesCount
+    };
+
+    map['instrumentationLibrarySpans'] = instrumentationLibrarySpans;
+
+    return map;
+  }
+
+  List<Map<String, dynamic>> _spansToList(List<pb_trace.Span> spans) {
+    return spans.map((span) {
+      final attributes = span.attributes;
+      final events = span.events;
+      return {
+        'spanId': api.SpanId(span.spanId).toString(),
+        'traceId': api.TraceId(span.traceId).toString(),
+        'name': span.name,
+        'kind': span.kind.value,
+        'startTimeUnixNano': span.startTimeUnixNano.toInt(),
+        'endTimeUnixNano': span.endTimeUnixNano.toInt(),
+        'droppedAttributesCount': span.droppedAttributesCount,
+        'droppedEventsCount': span.droppedEventsCount,
+        'attributes': _attributesToList(attributes),
+        'events': _eventsToList(events, attributes)
+      };
+    }).toList();
+  }
+
+  List<Map<String, Object>> _eventsToList(
+      List<pb_trace.Span_Event> events, List<pb_common.KeyValue> attributes) {
+    return events
+        .map(
+          (e) => {
+            'timeUnixNano': e.timeUnixNano.toInt(),
+            'name': e.name,
+            'attributes': _attributesToList(attributes),
+            'droppedAttributesCount': e.droppedAttributesCount
+          },
+        )
+        .toList();
+  }
+
+  List<Map<String, dynamic>> _attributesToList(
+      List<pb_common.KeyValue> attributes) {
+    return attributes
+        .map(
+          (e) => {
+            'key': e.key,
+            'value': {
+              'stringValue': e.value.stringValue,
+            },
+          },
+        )
+        .toList();
   }
 
   /// Group and construct the protobuf equivalent of the given list of [api.Span]s.
