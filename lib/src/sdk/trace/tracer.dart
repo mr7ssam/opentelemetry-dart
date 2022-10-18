@@ -25,7 +25,7 @@ class Tracer implements api.Tracer {
   @override
   api.Span startSpan(String name,
       {api.Context? context,
-      api.SpanKind? kind,
+      api.SpanKind? kind = api.SpanKind.client,
       List<api.Attribute>? attributes,
       List<api.SpanLink>? links,
       Int64? startTime}) {
