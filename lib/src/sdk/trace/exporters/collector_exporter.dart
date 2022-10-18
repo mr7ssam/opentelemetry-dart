@@ -54,11 +54,9 @@ class CollectorExporter implements api.SpanExporter {
 
   Map<String, dynamic> _resourceSpansToMap(
       Iterable<pb_trace.ResourceSpans> resourceSpans) {
-    final resourceSpans = [];
-    for (final resourceSpan in resourceSpans) {
-      resourceSpans.add(_resourceSpanToMap(resourceSpan));
-    }
-    return {'resourceSpans': resourceSpans};
+    return {
+      'resourceSpans': resourceSpans.map(_resourceSpanToMap).toList(),
+    };
   }
 
   Map<String, dynamic> _resourceSpanToMap(pb_trace.ResourceSpans resourceSpan) {
