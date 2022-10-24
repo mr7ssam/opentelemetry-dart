@@ -99,7 +99,7 @@ class CollectorExporter implements api.SpanExporter {
         'kind': span.kind.value,
         'status': {
           'code': span.status.code.value,
-          'description': span.status.message
+          'message': span.status.message
         },
         'startTimeUnixNano': span.startTimeUnixNano.toInt(),
         'endTimeUnixNano': span.endTimeUnixNano.toInt(),
