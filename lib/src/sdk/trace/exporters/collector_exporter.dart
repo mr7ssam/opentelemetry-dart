@@ -97,6 +97,10 @@ class CollectorExporter implements api.SpanExporter {
         'traceId': api.TraceId(span.traceId).toString(),
         'name': span.name,
         'kind': span.kind.value,
+        'status': {
+          'code': span.status.code.value,
+          'description': span.status.message
+        },
         'startTimeUnixNano': span.startTimeUnixNano.toInt(),
         'endTimeUnixNano': span.endTimeUnixNano.toInt(),
         'droppedAttributesCount': span.droppedAttributesCount,
