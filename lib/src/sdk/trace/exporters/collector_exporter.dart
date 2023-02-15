@@ -24,7 +24,9 @@ class CollectorExporter implements api.SpanExporter {
 
   CollectorExporter(this.uri, {Dio? dio}) {
     client = dio ?? Dio();
-    client.options.baseUrl = uri;
+    client.options
+      ..baseUrl = baseUrl
+      ..headers = {'Content-Type': 'application/json; charset=UTF-8'};
   }
 
   @override
